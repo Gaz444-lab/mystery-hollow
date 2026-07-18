@@ -8,24 +8,49 @@ Live in a cozy, atmospheric small town. Customize your detective, pick an era, m
 
 ---
 
-## For your son (MacBook) — quick start
+## For Connor’s Mac (same idea as School Hub)
 
-1. **Install Godot 4.3+** (macOS):  
-   https://godotengine.org/download/macos/  
-   Choose the **standard** build (not .NET unless you prefer C#).
-2. **Get the game** (pick one):
-   - **Clone:**  
-     ```bash
-     git clone https://github.com/Gaz444-lab/mystery-hollow.git
-     cd mystery-hollow
-     ```
-   - **Or** download ZIP from GitHub → **Code → Download ZIP** → unzip.
-3. **Open the project:**
-   - Launch Godot → **Import** → select the `mystery-hollow` folder → **Import & Edit**
-   - Press **F5** (or the Play button)
-4. **Optional launcher:** double-click **`Launch Mystery Hollow.command`** (after Godot is installed).
+### First time only
 
-**Shared family tip:** Keep the project in a folder you both can clone (GitHub). Saves are stored **per Mac** under Godot’s user data (`user://saves`), not inside the repo — so each player has their own progress.
+1. If git isn’t installed yet, open **Terminal** once and run:
+   ```bash
+   xcode-select --install
+   ```
+   Wait until that finishes.
+2. Paste this in **Terminal**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Gaz444-lab/mystery-hollow/main/scripts/setup-for-connor.sh | bash
+```
+
+That will:
+
+- Download the game into `~/Documents/mystery-hollow`
+- Install **Godot 4** (the engine) if it’s missing
+- Put two shortcuts on the **Desktop**:
+
+| Shortcut | When to use |
+|----------|-------------|
+| **Mystery Hollow.command** | Play the game |
+| **Update Mystery Hollow.command** | After Dad says he pushed an update |
+
+macOS may ask to allow Terminal the first time → **Open**.  
+If it blocks Godot: **System Settings → Privacy & Security → Open Anyway**.
+
+### Every day
+
+1. Double-click **Mystery Hollow.command**
+2. Play (WASD move, mouse look, E interact, J journal)
+
+### When Dad ships an update
+
+Double-click **Update Mystery Hollow.command**, then open **Mystery Hollow** again.
+
+> Saves stay on **his** Mac only — updates do **not** wipe progress.
+
+### Manual / developer open
+
+Install Godot 4.3+ and open the project folder in Godot → **F5**, or run `./Mystery Hollow.command` from the repo.
 
 ---
 
