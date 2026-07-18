@@ -1,0 +1,446 @@
+{
+  "id": "case_01_riverside",
+  "title": "The Riverside Murder",
+  "starts_available": true,
+  "summary": "Clara Finch, assistant to Mayor Hart, was found dead on the riverbank at dawn. The town is whispering. Three suspects have shaky alibis.",
+  "location_hint": "Start at the Detective Agency, then visit the river crime scene east of downtown.",
+  "correct_suspect": "suspect_marcus",
+  "required_evidence_to_accuse": [
+    "muddy_boots_cast",
+    "ledger_page",
+    "threatening_note",
+    "river_watch"
+  ],
+  "evidence": [
+    {
+      "id": "river_watch",
+      "name": "Broken Pocket Watch",
+      "description": "Found clutched in Clara's hand. Stopped at 11:42 PM. Engraved 'M.R.' on the back.",
+      "scene": "crime_scene"
+    },
+    {
+      "id": "muddy_boots_cast",
+      "name": "Boot Print Cast",
+      "description": "Size 11 work boot, deep tread, right heel worn inward. Matches warehouse boots.",
+      "scene": "crime_scene"
+    },
+    {
+      "id": "threatening_note",
+      "name": "Torn Note",
+      "description": "Half a note: 'Stop looking into the books or—' ink smudged by river water.",
+      "scene": "crime_scene"
+    },
+    {
+      "id": "ledger_page",
+      "name": "Torn Ledger Page",
+      "description": "Town warehouse accounts. Several payments marked 'consulting' to M.R. — totals don't add up.",
+      "scene": "warehouse"
+    },
+    {
+      "id": "vera_key",
+      "name": "Office Spare Key",
+      "description": "Vera admits she had a spare key to Clara's office. Doesn't prove violence.",
+      "scene": "interview"
+    },
+    {
+      "id": "owen_debt",
+      "name": "IOU Slip",
+      "description": "Owen owed Clara money for a failed side job. Motive, but his boot size is 9.",
+      "scene": "interview"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "suspect_vera",
+      "name": "Vera Lang",
+      "role": "Town clerk",
+      "bio": "Ambitious, sharp-tongued. Wanted Clara's job. Was seen arguing with her last week."
+    },
+    {
+      "id": "suspect_marcus",
+      "name": "Marcus Reed",
+      "role": "Warehouse foreman",
+      "bio": "Quiet, strong, always in work boots. Initials M.R. Runs night inventory alone."
+    },
+    {
+      "id": "suspect_owen",
+      "name": "Owen Pike",
+      "role": "Odd-job handyman",
+      "bio": "Charming liar. Owes half the town money. Size 9 boots, bright sneakers."
+    }
+  ],
+  "scenes": [
+    {
+      "id": "crime_scene",
+      "label": "Riverbank Crime Scene",
+      "world_marker": "crime_scene",
+      "interactables": ["river_watch", "muddy_boots_cast", "threatening_note"]
+    },
+    {
+      "id": "warehouse",
+      "label": "Town Warehouse",
+      "world_marker": "warehouse",
+      "interactables": ["ledger_page"]
+    }
+  ],
+  "dialogues": {
+    "deputy_cole": [
+      {
+        "id": "start",
+        "speaker": "Deputy Cole",
+        "text": "Detective. Clara Finch. Riverbank. No signs of a struggle by the waterline — she was moved, or she fell after the blow.",
+        "options": [
+          {"text": "Walk me through the timeline.", "next": "timeline", "rel": 1},
+          {"text": "Who found the body?", "next": "found", "rel": 0},
+          {"text": "I'll start at the scene.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "timeline",
+        "speaker": "Deputy Cole",
+        "text": "Last seen leaving the town office around 10:30 PM. Body found at 5:40 AM by Ben who jogs the river path. Watch stopped at 11:42.",
+        "options": [
+          {"text": "Any suspects yet?", "next": "suspects", "rel": 1},
+          {"text": "Thanks, Deputy.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "found",
+        "speaker": "Deputy Cole",
+        "text": "Ben Carter. Solid kid. Shaken up. He's still at the diner if you want a statement.",
+        "options": [
+          {"text": "I'll talk to him.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "suspects",
+        "speaker": "Deputy Cole",
+        "text": "Three names keep coming up: Vera Lang at the clerk's desk, Marcus Reed at the warehouse, and Owen Pike who floats between jobs. Don't accuse without proof — Hollow doesn't forget.",
+        "options": [
+          {"text": "Understood.", "next": "end", "rel": 2}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Deputy Cole",
+        "text": "Radio if you need backup. And Detective… Clara was good people.",
+        "options": []
+      }
+    ],
+    "witness_ben": [
+      {
+        "id": "start",
+        "speaker": "Ben Carter",
+        "text": "I was jogging. Saw something pale near the reeds. Thought it was trash. It wasn't. I called the deputy right away.",
+        "options": [
+          {"text": "Did you see anyone else?", "next": "anyone", "rel": 1},
+          {"text": "Any vehicles?", "next": "vehicle", "rel": 1},
+          {"text": "That's enough for now.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "anyone",
+        "speaker": "Ben Carter",
+        "text": "Not clearly. But earlier, around midnight, I heard a truck near the warehouse road. Heavy diesel. Didn't think much of it until… this.",
+        "options": [
+          {"text": "Which direction?", "next": "direction", "rel": 2},
+          {"text": "Appreciate it.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "direction",
+        "speaker": "Ben Carter",
+        "text": "Toward the warehouse lot. Marcus works nights sometimes. Or used to.",
+        "options": [
+          {"text": "You've been helpful, Ben.", "next": "end", "rel": 3}
+        ]
+      },
+      {
+        "id": "vehicle",
+        "speaker": "Ben Carter",
+        "text": "Didn't see headlights on the river path. Just that truck sound inland.",
+        "options": [
+          {"text": "Got it.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Ben Carter",
+        "text": "I keep replaying it. If I can help again, I'm at the diner most mornings.",
+        "options": []
+      }
+    ],
+    "suspect_vera": [
+      {
+        "id": "start",
+        "speaker": "Vera Lang",
+        "text": "I know what people say. That I wanted her desk. Ambition isn't murder, Detective.",
+        "lie_flag": false,
+        "options": [
+          {"text": "Where were you at 11:42 PM?", "next": "alibi", "rel": 0},
+          {"text": "You had a key to her office.", "next": "key", "requires_evidence": [], "rel": 0},
+          {"text": "Tell me about the ledger.", "next": "ledger", "requires_evidence": ["ledger_page"], "rel": 0},
+          {"text": "That's all for now.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "alibi",
+        "speaker": "Vera Lang",
+        "text": "Home. Alone. Reading. No, I don't have a witness. Not everyone lives their life for an audience.",
+        "lie_flag": false,
+        "options": [
+          {"text": "Convenient.", "next": "start", "rel": -1},
+          {"text": "Fair enough.", "next": "start", "rel": 1}
+        ]
+      },
+      {
+        "id": "key",
+        "speaker": "Vera Lang",
+        "text": "Yes, I had a spare. Mayor asked me to lock up when Clara left early. I returned it to the board this morning — after I heard.",
+        "lie_flag": false,
+        "gives_evidence": "vera_key",
+        "options": [
+          {"text": "Anyone else with access?", "next": "access", "rel": 1},
+          {"text": "Back to the point.", "next": "start", "rel": 0}
+        ]
+      },
+      {
+        "id": "access",
+        "speaker": "Vera Lang",
+        "text": "Warehouse staff still pick up sealed envelopes from her outbox. Marcus Reed came by often. Too often.",
+        "lie_flag": false,
+        "options": [
+          {"text": "Interesting.", "next": "start", "rel": 1}
+        ]
+      },
+      {
+        "id": "ledger",
+        "speaker": "Vera Lang",
+        "text": "Those 'consulting' lines? Clara flagged them last month. She was digging into warehouse payouts. Someone didn't like that.",
+        "lie_flag": false,
+        "options": [
+          {"text": "Who benefits?", "next": "benefits", "rel": 2}
+        ]
+      },
+      {
+        "id": "benefits",
+        "speaker": "Vera Lang",
+        "text": "Marcus signs the night sheets. If the numbers are fiction, his name is on the fiction.",
+        "lie_flag": false,
+        "options": [
+          {"text": "Thank you, Vera.", "next": "end", "rel": 2}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Vera Lang",
+        "text": "Find who did this. Clara and I weren't friends — but she didn't deserve the river.",
+        "options": []
+      }
+    ],
+    "suspect_marcus": [
+      {
+        "id": "start",
+        "speaker": "Marcus Reed",
+        "text": "I already talked to Cole. I was at the warehouse doing inventory. Alone. That's my job.",
+        "lie_flag": true,
+        "lie_tell": "He looks at his boots instead of your eyes when he says 'alone'.",
+        "options": [
+          {"text": "Your watch was in her hand.", "next": "watch", "requires_evidence": ["river_watch"], "rel": 0},
+          {"text": "Boot prints match your size.", "next": "boots", "requires_evidence": ["muddy_boots_cast"], "rel": 0},
+          {"text": "Explain the ledger payments.", "next": "ledger", "requires_evidence": ["ledger_page"], "rel": 0},
+          {"text": "I'll be back.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "watch",
+        "speaker": "Marcus Reed",
+        "text": "Plenty of people have initials. Maybe she bought it used. Maybe you're stretching.",
+        "lie_flag": true,
+        "lie_tell": "His jaw tightens. Sweat at the temple.",
+        "options": [
+          {"text": "It stopped at 11:42 — when Ben heard your truck.", "next": "cornered", "requires_evidence": ["river_watch"], "rel": -2},
+          {"text": "We'll see.", "next": "start", "rel": 0}
+        ]
+      },
+      {
+        "id": "boots",
+        "speaker": "Marcus Reed",
+        "text": "I work the river road. Mud is not a confession.",
+        "lie_flag": false,
+        "options": [
+          {"text": "Worn heel matches the cast.", "next": "heel", "requires_evidence": ["muddy_boots_cast"], "rel": -1}
+        ]
+      },
+      {
+        "id": "heel",
+        "speaker": "Marcus Reed",
+        "text": "…You measured my boots?",
+        "lie_flag": false,
+        "options": [
+          {"text": "I measure everything.", "next": "start", "rel": -2}
+        ]
+      },
+      {
+        "id": "ledger",
+        "speaker": "Marcus Reed",
+        "text": "Consulting fees. Contractors. Not my department to question the mayor's envelopes.",
+        "lie_flag": true,
+        "lie_tell": "His voice jumps half a note on 'not my department'.",
+        "options": [
+          {"text": "Clara was about to expose you.", "next": "cornered", "requires_evidence": ["ledger_page", "threatening_note"], "rel": -3},
+          {"text": "Keep talking.", "next": "start", "rel": 0}
+        ]
+      },
+      {
+        "id": "cornered",
+        "speaker": "Marcus Reed",
+        "text": "She wouldn't drop it. Said she'd go to the papers. I only meant to scare her at the river. She slipped. Or she didn't. Either way it's done.",
+        "lie_flag": false,
+        "options": [
+          {"text": "That's enough. Don't leave town.", "next": "end", "rel": -5}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Marcus Reed",
+        "text": "You've got your story. See if a jury likes it.",
+        "options": []
+      }
+    ],
+    "suspect_owen": [
+      {
+        "id": "start",
+        "speaker": "Owen Pike",
+        "text": "Detective! Always a pleasure. I didn't kill Clara. I liked Clara. She loaned me money, which is more than most do.",
+        "lie_flag": false,
+        "options": [
+          {"text": "You owed her.", "next": "debt", "rel": 0},
+          {"text": "Where were you that night?", "next": "alibi", "rel": 0},
+          {"text": "Boot size?", "next": "boots", "requires_evidence": ["muddy_boots_cast"], "rel": 0},
+          {"text": "Later, Owen.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "debt",
+        "speaker": "Owen Pike",
+        "text": "Forty bucks and a busted porch job. Here's the IOU — I'm not proud, but I'm not a killer.",
+        "lie_flag": false,
+        "gives_evidence": "owen_debt",
+        "options": [
+          {"text": "I'll keep this.", "next": "start", "rel": 1}
+        ]
+      },
+      {
+        "id": "alibi",
+        "speaker": "Owen Pike",
+        "text": "Bartender Sam will tell you I closed the bar stool until 1 AM. Ask him.",
+        "lie_flag": false,
+        "options": [
+          {"text": "I will.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "boots",
+        "speaker": "Owen Pike",
+        "text": "Size 9, baby. And I wore sneakers that night — white ones. Mud would ruin the look.",
+        "lie_flag": false,
+        "options": [
+          {"text": "You're free to go… for now.", "next": "end", "rel": 2}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Owen Pike",
+        "text": "If you clear me, maybe buy me a coffee. Hollow's going to need cheering up.",
+        "options": []
+      }
+    ],
+    "bartender_sam": [
+      {
+        "id": "start",
+        "speaker": "Sam",
+        "text": "What can I pour you, Detective? Coffee's always free for the badge.",
+        "options": [
+          {"text": "Was Owen here last night?", "next": "owen", "rel": 1},
+          {"text": "Just coffee.", "next": "coffee", "rel": 1},
+          {"text": "Nothing right now.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "owen",
+        "speaker": "Sam",
+        "text": "Stuck to that stool like gum. From ten to one. Loud about a card game he lost. Didn't leave.",
+        "options": [
+          {"text": "That helps. Thanks.", "next": "end", "rel": 2}
+        ]
+      },
+      {
+        "id": "coffee",
+        "speaker": "Sam",
+        "text": "On the house. You look like you haven't slept since the river news.",
+        "options": [
+          {"text": "Appreciate it.", "next": "end", "action": "eat", "rel": 1}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Sam",
+        "text": "Door's always open. Gossip included.",
+        "options": []
+      }
+    ],
+    "mayor_hart": [
+      {
+        "id": "start",
+        "speaker": "Mayor Hart",
+        "text": "Clara kept this town running. Find who did this. Quietly, if you can — but thoroughly.",
+        "options": [
+          {"text": "I'll need access to her files.", "next": "files", "rel": 1},
+          {"text": "Any enemies?", "next": "enemies", "rel": 1},
+          {"text": "Yes, Mayor.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "files",
+        "speaker": "Mayor Hart",
+        "text": "Vera can open the office. Clara was reviewing warehouse contracts. She left a note on my desk: 'Something's wrong with M.R. payments.'",
+        "options": [
+          {"text": "That tracks.", "next": "end", "rel": 2}
+        ]
+      },
+      {
+        "id": "enemies",
+        "speaker": "Mayor Hart",
+        "text": "Not enemies — friction. Vera wanted more responsibility. Marcus hated paperwork. Owen hated paying people back.",
+        "options": [
+          {"text": "I'll dig.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Mayor Hart",
+        "text": "Mystery Hollow is watching, Detective. So am I.",
+        "options": []
+      }
+    ]
+  },
+  "endings": {
+    "correct": {
+      "text": "Marcus Reed breaks in interrogation. Clara discovered he was skimming warehouse 'consulting' funds. He confronted her by the river; the argument turned fatal. His watch, boots, the note, and the ledger seal the case. Mystery Hollow exhales — justice, hard-earned.",
+      "reward": 350
+    },
+    "wrong_suspect_vera": {
+      "text": "You accuse Vera Lang. The town turns on her. Weeks later, the real trail — Marcus and the warehouse books — surfaces without you. Your reputation takes a hit. Vera never quite forgives you."
+    },
+    "wrong_suspect_owen": {
+      "text": "Owen Pike is loud, broke, and easy to blame. A jury wouldn't. The real killer walks free long enough to burn the remaining ledgers. Hollow learns to doubt your badge."
+    },
+    "wrong_suspect_marcus": {
+      "text": "You name Marcus but without enough paper trail. He walks on reasonable doubt. The case goes cold — for now."
+    },
+    "wrong_generic": {
+      "text": "The accusation doesn't stick. Evidence was incomplete. The case cools, and so does the town's faith in you."
+    }
+  }
+}

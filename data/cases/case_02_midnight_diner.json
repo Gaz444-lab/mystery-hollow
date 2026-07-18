@@ -1,0 +1,86 @@
+{
+  "id": "case_02_midnight_diner",
+  "title": "Midnight at the Diner",
+  "starts_available": false,
+  "summary": "After the riverside case, a second body turns up behind Sam's diner. A locked freezer, a missing cook, and a town that wants answers before breakfast.",
+  "location_hint": "Unlocks after solving The Riverside Murder. Start at the diner alley.",
+  "correct_suspect": "suspect_owen",
+  "required_evidence_to_accuse": ["grease_knife", "freezer_lock", "debt_ledger"],
+  "evidence": [
+    {
+      "id": "grease_knife",
+      "name": "Kitchen Knife",
+      "description": "Wiped clean but with grease residue matching the night fryer oil.",
+      "scene": "diner_alley"
+    },
+    {
+      "id": "freezer_lock",
+      "name": "Broken Padlock",
+      "description": "Forced from the outside. Someone wanted into the walk-in — or wanted someone sealed in.",
+      "scene": "diner_alley"
+    },
+    {
+      "id": "debt_ledger",
+      "name": "Gambling IOUs",
+      "description": "Owen's name all over a backroom book. The cook was the lender.",
+      "scene": "interview"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "suspect_owen",
+      "name": "Owen Pike",
+      "role": "Handyman / gambler",
+      "bio": "Cleared of the river murder — but debts don't sleep."
+    },
+    {
+      "id": "bartender_sam",
+      "name": "Sam",
+      "role": "Diner / bar owner",
+      "bio": "Owns the alley. Insurance would look convenient — if you think the worst."
+    },
+    {
+      "id": "suspect_vera",
+      "name": "Vera Lang",
+      "role": "Town clerk",
+      "bio": "Was seen near the diner arguing about a late-night permit."
+    }
+  ],
+  "scenes": [],
+  "dialogues": {
+    "bartender_sam": [
+      {
+        "id": "start",
+        "speaker": "Sam",
+        "text": "I found him behind the bins at 4 AM. Cook didn't show for open. I thought he quit. He didn't.",
+        "options": [
+          {"text": "Who had access to the alley?", "next": "access", "rel": 1},
+          {"text": "I'll look around.", "next": "end", "rel": 0}
+        ]
+      },
+      {
+        "id": "access",
+        "speaker": "Sam",
+        "text": "Staff, deliveries, and anyone who cuts through to the river path. Owen was here late — again.",
+        "options": [
+          {"text": "Thanks, Sam.", "next": "end", "rel": 1}
+        ]
+      },
+      {
+        "id": "end",
+        "speaker": "Sam",
+        "text": "I just want to open the doors again without people staring.",
+        "options": []
+      }
+    ]
+  },
+  "endings": {
+    "correct": {
+      "text": "Owen snapped over a debt he couldn't pay. The cook cornered him; Owen used the kitchen knife and staged the freezer lock. Hollow learns even the charming ones keep score.",
+      "reward": 300
+    },
+    "wrong_generic": {
+      "text": "Wrong call. The diner case cools and Sam loses half his regulars."
+    }
+  }
+}

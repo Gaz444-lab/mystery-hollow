@@ -1,0 +1,30 @@
+# Godot 4
+.godot/
+*.translation
+export_presets.cfg
+export.cfg
+.import/
+*.import
+
+# OS
+.DS_Store
+Thumbs.db
+*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Builds / exports
+build/
+exports/
+*.app
+*.dmg
+*.zip
+*.pck
+*.exe
+
+# Local saves (keep structure)
+# user:// is outside the project; nothing to ignore here

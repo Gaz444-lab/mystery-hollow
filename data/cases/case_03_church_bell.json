@@ -1,0 +1,60 @@
+{
+  "id": "case_03_church_bell",
+  "title": "The Silent Bell",
+  "starts_available": false,
+  "summary": "The church bell didn't ring at noon. Inside: the sexton dead, the rope cut, and a sealed letter addressed to the Mayor.",
+  "location_hint": "Expansion case — wire into the world after case 2.",
+  "correct_suspect": "mayor_hart",
+  "required_evidence_to_accuse": ["cut_rope", "sealed_letter", "old_photo"],
+  "evidence": [
+    {
+      "id": "cut_rope",
+      "name": "Cut Bell Rope",
+      "description": "Clean cut, not frayed. Professional knife work.",
+      "scene": "church"
+    },
+    {
+      "id": "sealed_letter",
+      "name": "Letter to the Mayor",
+      "description": "Unopened when found. Inside: proof of a decades-old cover-up tied to the warehouse land.",
+      "scene": "church"
+    },
+    {
+      "id": "old_photo",
+      "name": "Faded Photograph",
+      "description": "Young Mayor Hart with the sexton — and a third man who vanished in the 90s.",
+      "scene": "church"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "mayor_hart",
+      "name": "Mayor Hart",
+      "role": "Mayor",
+      "bio": "Beloved. Powerful. Suddenly very quiet about the church."
+    },
+    {
+      "id": "deputy_cole",
+      "name": "Deputy Cole",
+      "role": "Deputy",
+      "bio": "First on scene. Too clean a report, too fast."
+    },
+    {
+      "id": "dr_ellis",
+      "name": "Dr. Ellis",
+      "role": "Town doctor",
+      "bio": "Signed old death certificates. Knows more than she says."
+    }
+  ],
+  "scenes": [],
+  "dialogues": {},
+  "endings": {
+    "correct": {
+      "text": "The letter would have ended Hart's career — and more. The sexton was going public. Hart silenced the bell and the man who rang it. Mystery Hollow finally sees its own reflection.",
+      "reward": 500
+    },
+    "wrong_generic": {
+      "text": "You miss the mark. The letter disappears from evidence. Some secrets stay buried under the steeple."
+    }
+  }
+}
