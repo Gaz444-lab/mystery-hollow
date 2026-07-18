@@ -62,7 +62,7 @@ func new_game(era_id: String, char_data: Dictionary) -> void:
 	relationships.clear()
 	_seed_default_relationships()
 	house_furniture = _default_furniture()
-	player_position = Vector3(0, 1, 8)
+	player_position = Vector3(0, 1.5, 10)
 	player_rotation_y = 0.0
 	current_location = "town"
 	tutorial_done = false

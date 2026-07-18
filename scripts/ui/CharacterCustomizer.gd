@@ -72,7 +72,7 @@ func _build_character() -> Dictionary:
 		"face_style": int(face_slider.value),
 		"outfit": outfit_option.selected,
 		"accessory": accessory_option.selected,
-		"primary_color": preview.color.darkened(0.2),
+		"primary_color": Color(preview.color.darkened(0.2)),
 		"secondary_color": Color(0.75, 0.7, 0.55),
 	}
 

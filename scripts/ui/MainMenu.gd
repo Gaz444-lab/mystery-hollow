@@ -60,11 +60,13 @@ func _populate_loads() -> void:
 func _on_era_pressed(era_id: String) -> void:
 	_selected_era = era_id
 	var era: Dictionary = EraManager.ERAS[era_id]
+	var tools: Array = era.get("tools", [])
+	var tool_str := ", ".join(PackedStringArray(tools))
 	era_desc.text = "%s\n%s\nVehicle: %s · Tools: %s" % [
 		era["tagline"],
 		"Fashion & tech shift with the era.",
 		era["vehicle"],
-		", ".join(era["tools"]),
+		tool_str,
 	]
 
 

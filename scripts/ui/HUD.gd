@@ -229,7 +229,11 @@ func _refresh_journal() -> void:
 		for s in def.get("suspects", []):
 			lines.append("• %s (%s) — %s" % [s.get("name"), s.get("role"), s.get("bio")])
 		lines.append("")
-		lines.append("[b]Interviewed[/b]: %s" % ", ".join(state.get("interviewed", [])) if state.get("interviewed", []) else "None yet")
+		var interviewed: Array = state.get("interviewed", [])
+		if interviewed.is_empty():
+			lines.append("[b]Interviewed[/b]: None yet")
+		else:
+			lines.append("[b]Interviewed[/b]: %s" % ", ".join(PackedStringArray(interviewed)))
 		if CaseManager.can_accuse():
 			lines.append("")
 			lines.append("[color=gold]You have enough to make an accusation at the Agency.[/color]")
