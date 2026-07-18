@@ -1,9 +1,11 @@
 extends "res://scripts/world/Interactable.gd"
-## Blocky Minecraft-style townsfolk.
+## Townsperson — stylized realistic low-poly humanoid + dialogue.
+
+const HumanoidBuilder = preload("res://scripts/character/HumanoidBuilder.gd")
 
 @export var npc_id: String = ""
 @export var display_name: String = "Townsperson"
-@export var body_color: Color = Color(0.4, 0.35, 0.3)
+@export var body_color: Color = Color(0.35, 0.32, 0.3)
 
 
 func _ready() -> void:
@@ -14,24 +16,28 @@ func _ready() -> void:
 
 
 func _build_mesh() -> void:
-	var VoxelStyle = load("res://scripts/world/VoxelStyle.gd")
-	var skin := Color(0.9, 0.72, 0.55)
-	var pants := Color(0.25, 0.25, 0.35)
-	var hair := Color(0.2, 0.12, 0.08)
-	# Slight variety from shirt color hash
-	var h: float = fmod(body_color.r * 7.0 + body_color.g * 3.0, 1.0)
-	if h > 0.6:
-		hair = Color(0.55, 0.35, 0.15)
-	elif h > 0.3:
-		hair = Color(0.12, 0.1, 0.1)
-	VoxelStyle.build_humanoid(self, skin, body_color, pants, hair)
-	# Collision capsule for talking range
+	var data := {
+		"gender": "neutral",
+		"height": 1,
+		"body_type": 1,
+		"skin_tone": 1 + (npc_id.length() % 4),
+		"hair_style": npc_id.length() % 4,
+		"hair_color": npc_id.length() % 5,
+		"eye_color": npc_id.length() % 4,
+		"facial_hair": 1 if npc_id in ["suspect_marcus", "mayor_hart", "bartender_sam"] else 0,
+		"outfit": 0,
+		"accessory": 1 if npc_id == "dr_ellis" else 0,
+		"badge": 1 if npc_id == "deputy_cole" else 0,
+		"primary_color": body_color,
+		"secondary_color": body_color.darkened(0.25),
+	}
+	HumanoidBuilder.build(self, data)
 	var col := CollisionShape3D.new()
 	var shape := CapsuleShape3D.new()
-	shape.radius = 0.4
-	shape.height = 1.9
+	shape.radius = 0.35
+	shape.height = 1.7
 	col.shape = shape
-	col.position.y = 0.95
+	col.position.y = 0.9
 	add_child(col)
 
 

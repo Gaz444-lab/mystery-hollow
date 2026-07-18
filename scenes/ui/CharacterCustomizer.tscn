@@ -16,132 +16,180 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.1, 0.1, 0.14, 1)
+color = Color(0.1, 0.11, 0.14, 1)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 20
 
 [node name="HBox" type="HBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 40
+theme_override_constants/separation = 28
 
-[node name="Left" type="VBoxContainer" parent="Margin/HBox"]
+[node name="Scroll" type="ScrollContainer" parent="Margin/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+horizontal_scroll_mode = 0
 
-[node name="Header" type="Label" parent="Margin/HBox/Left"]
+[node name="Left" type="VBoxContainer" parent="Margin/HBox/Scroll"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-theme_override_colors/font_color = Color(0.85, 0.72, 0.35, 1)
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Header" type="Label" parent="Margin/HBox/Scroll/Left"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.85, 0.75, 0.45, 1)
 text = "Character Creator"
 
-[node name="EraLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="EraLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Era: Present Day"
+text = "Era"
 
-[node name="NameLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="NameLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
 text = "Name"
 
-[node name="NameEdit" type="LineEdit" parent="Margin/HBox/Left"]
+[node name="NameEdit" type="LineEdit" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Detective name"
 
-[node name="GenderLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="GenderLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
-text = "Presentation"
+text = "Gender / presentation"
 
-[node name="GenderOption" type="OptionButton" parent="Margin/HBox/Left"]
+[node name="GenderOption" type="OptionButton" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BodyLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="HeightLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
-text = "Body type"
+text = "Height"
 
-[node name="BodySlider" type="HSlider" parent="Margin/HBox/Left"]
+[node name="HeightSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 2.0
 value = 1.0
 rounded = true
 
-[node name="SkinLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="BodyLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
+layout_mode = 2
+text = "Body type"
+
+[node name="BodySlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 2.0
+value = 1.0
+rounded = true
+
+[node name="SkinLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
 text = "Skin tone"
 
-[node name="SkinSlider" type="HSlider" parent="Margin/HBox/Left"]
+[node name="SkinSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 5.0
 value = 2.0
 rounded = true
 
-[node name="HairLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="HairLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
 text = "Hairstyle"
 
-[node name="HairSlider" type="HSlider" parent="Margin/HBox/Left"]
+[node name="HairSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
-max_value = 5.0
+max_value = 3.0
 rounded = true
 
-[node name="HairColorLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="HairColorLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
 text = "Hair color"
 
-[node name="HairColorSlider" type="HSlider" parent="Margin/HBox/Left"]
+[node name="HairColorSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 5.0
 rounded = true
 
-[node name="FaceLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="EyeLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
-text = "Facial features"
+text = "Eye color"
 
-[node name="FaceSlider" type="HSlider" parent="Margin/HBox/Left"]
+[node name="EyeSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 4.0
 rounded = true
 
-[node name="OutfitLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="FaceLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
+layout_mode = 2
+text = "Face shape"
+
+[node name="FaceSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 4.0
+rounded = true
+
+[node name="FacialLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
+layout_mode = 2
+text = "Facial hair"
+
+[node name="FacialSlider" type="HSlider" parent="Margin/HBox/Scroll/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 2.0
+rounded = true
+
+[node name="OutfitLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
 text = "Outfit (era-aware)"
 
-[node name="OutfitOption" type="OptionButton" parent="Margin/HBox/Left"]
+[node name="OutfitOption" type="OptionButton" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="AccessoryLabel" type="Label" parent="Margin/HBox/Left"]
+[node name="AccessoryLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
 text = "Accessory (era-aware)"
 
-[node name="AccessoryOption" type="OptionButton" parent="Margin/HBox/Left"]
+[node name="AccessoryOption" type="OptionButton" parent="Margin/HBox/Scroll/Left"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Buttons" type="HBoxContainer" parent="Margin/HBox/Left"]
+[node name="BackstoryLabel" type="Label" parent="Margin/HBox/Scroll/Left"]
 layout_mode = 2
-theme_override_constants/separation = 12
+text = "Backstory"
 
-[node name="Back" type="Button" parent="Margin/HBox/Left/Buttons"]
+[node name="BackstoryOption" type="OptionButton" parent="Margin/HBox/Scroll/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/HBox/Scroll/Left"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Back" type="Button" parent="Margin/HBox/Scroll/Left/Buttons"]
 layout_mode = 2
 text = "Back"
 
-[node name="Start" type="Button" parent="Margin/HBox/Left/Buttons"]
+[node name="Randomize" type="Button" parent="Margin/HBox/Scroll/Left/Buttons"]
+layout_mode = 2
+text = "Randomize"
+
+[node name="Start" type="Button" parent="Margin/HBox/Scroll/Left/Buttons"]
 layout_mode = 2
 text = "Enter Mystery Hollow"
 
@@ -154,12 +202,39 @@ layout_mode = 2
 text = "Preview"
 horizontal_alignment = 1
 
-[node name="Preview" type="ColorRect" parent="Margin/HBox/Right"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 320)
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Margin/HBox/Right"]
+custom_minimum_size = Vector2(320, 380)
 layout_mode = 2
 size_flags_horizontal = 4
-color = Color(0.25, 0.3, 0.45, 1)
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="Margin/HBox/Right/SubViewportContainer"]
+own_world_3d = true
+handle_input_locally = false
+size = Vector2i(320, 380)
+render_target_update_mode = 4
+
+[node name="WorldEnv" type="WorldEnvironment" parent="Margin/HBox/Right/SubViewportContainer/SubViewport"]
+
+[node name="Light" type="DirectionalLight3D" parent="Margin/HBox/Right/SubViewportContainer/SubViewport"]
+transform = Transform3D(0.86, -0.35, 0.37, 0, 0.73, 0.68, -0.51, -0.59, 0.63, 0, 2, 2)
+light_energy = 1.2
+
+[node name="PreviewRoot" type="Node3D" parent="Margin/HBox/Right/SubViewportContainer/SubViewport"]
+unique_name_in_owner = true
+
+[node name="PreviewCam" type="Camera3D" parent="Margin/HBox/Right/SubViewportContainer/SubViewport"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 3.2)
+current = true
+fov = 40.0
+
+[node name="Preview" type="ColorRect" parent="Margin/HBox/Right"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+color = Color(0.2, 0.22, 0.28, 1)
 
 [node name="PreviewLabel" type="Label" parent="Margin/HBox/Right"]
 unique_name_in_owner = true
@@ -167,14 +242,19 @@ layout_mode = 2
 horizontal_alignment = 1
 text = "Detective"
 
-[connection signal="text_changed" from="Margin/HBox/Left/NameEdit" to="." method="_on_any_changed"]
-[connection signal="item_selected" from="Margin/HBox/Left/GenderOption" to="." method="_on_any_changed"]
-[connection signal="value_changed" from="Margin/HBox/Left/BodySlider" to="." method="_on_any_changed"]
-[connection signal="value_changed" from="Margin/HBox/Left/SkinSlider" to="." method="_on_any_changed"]
-[connection signal="value_changed" from="Margin/HBox/Left/HairSlider" to="." method="_on_any_changed"]
-[connection signal="value_changed" from="Margin/HBox/Left/HairColorSlider" to="." method="_on_any_changed"]
-[connection signal="value_changed" from="Margin/HBox/Left/FaceSlider" to="." method="_on_any_changed"]
-[connection signal="item_selected" from="Margin/HBox/Left/OutfitOption" to="." method="_on_any_changed"]
-[connection signal="item_selected" from="Margin/HBox/Left/AccessoryOption" to="." method="_on_any_changed"]
-[connection signal="pressed" from="Margin/HBox/Left/Buttons/Back" to="." method="_on_back"]
-[connection signal="pressed" from="Margin/HBox/Left/Buttons/Start" to="." method="_on_start"]
+[connection signal="text_changed" from="Margin/HBox/Scroll/Left/NameEdit" to="." method="_on_any_changed"]
+[connection signal="item_selected" from="Margin/HBox/Scroll/Left/GenderOption" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/HeightSlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/BodySlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/SkinSlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/HairSlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/HairColorSlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/EyeSlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/FaceSlider" to="." method="_on_any_changed"]
+[connection signal="value_changed" from="Margin/HBox/Scroll/Left/FacialSlider" to="." method="_on_any_changed"]
+[connection signal="item_selected" from="Margin/HBox/Scroll/Left/OutfitOption" to="." method="_on_any_changed"]
+[connection signal="item_selected" from="Margin/HBox/Scroll/Left/AccessoryOption" to="." method="_on_any_changed"]
+[connection signal="item_selected" from="Margin/HBox/Scroll/Left/BackstoryOption" to="." method="_on_any_changed"]
+[connection signal="pressed" from="Margin/HBox/Scroll/Left/Buttons/Back" to="." method="_on_back"]
+[connection signal="pressed" from="Margin/HBox/Scroll/Left/Buttons/Randomize" to="." method="_on_randomize"]
+[connection signal="pressed" from="Margin/HBox/Scroll/Left/Buttons/Start" to="." method="_on_start"]

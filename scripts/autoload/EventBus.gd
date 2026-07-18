@@ -2,8 +2,10 @@ extends Node
 ## Global signal bus — keep systems decoupled.
 
 # Life sim
-signal needs_changed(hunger: float, energy: float, mood: float)
+signal needs_changed(hunger: float, energy: float, mood: float)  # legacy HUD
+signal needs_full(hunger: float, thirst: float, energy: float, hygiene: float, mood: float)
 signal relationship_changed(npc_id: String, value: int)
+signal weather_changed(weather_id: String)
 
 # World
 signal time_changed(hour: float, day: int)

@@ -28,6 +28,10 @@ func interact(actor: Node) -> void:
 			GameState.sleep()
 		"food":
 			GameState.eat()
+		"drink":
+			GameState.drink()
+		"wash":
+			GameState.wash()
 		"door_house":
 			EventBus.notification.emit("Entering your home…", 1.5)
 			get_tree().call_group("game_root", "enter_location", "house")

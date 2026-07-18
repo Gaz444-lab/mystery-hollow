@@ -39,6 +39,8 @@ func _ready() -> void:
 	notice_label.text = ""
 	lie_label.text = ""
 	EventBus.needs_changed.connect(_on_needs)
+	if EventBus.has_signal("needs_full"):
+		EventBus.needs_full.connect(_on_needs_full)
 	EventBus.time_changed.connect(_on_time)
 	EventBus.interaction_available.connect(func(t): prompt_label.text = t)
 	EventBus.interaction_cleared.connect(func(): prompt_label.text = "")
@@ -252,7 +254,14 @@ func _refresh_inventory() -> void:
 
 
 func _on_needs(h: float, e: float, m: float) -> void:
-	needs_label.text = "Hunger %d  |  Energy %d  |  Mood %d" % [int(h), int(e), int(m)]
+	# Legacy 3-need signal — prefer full if available
+	needs_label.text = "Hunger %d  ·  Energy %d  ·  Mood %d" % [int(h), int(e), int(m)]
+
+
+func _on_needs_full(h: float, t: float, e: float, hy: float, m: float) -> void:
+	needs_label.text = "Hunger %d  ·  Thirst %d  ·  Energy %d  ·  Hygiene %d  ·  Mood %d" % [
+		int(h), int(t), int(e), int(hy), int(m)
+	]
 
 
 func _on_time(hour: float, day: int) -> void:
