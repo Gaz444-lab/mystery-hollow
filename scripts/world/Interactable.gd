@@ -1,6 +1,6 @@
 extends StaticBody3D
-class_name Interactable
 ## Generic world interactable: door, evidence, bed, food, case board, etc.
+## (No class_name — preloaded by TownWorld to avoid cold-start parse failures.)
 
 @export var interact_id: String = ""
 @export var label: String = "Interact"

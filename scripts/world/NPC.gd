@@ -1,6 +1,6 @@
-extends Interactable
-class_name TownNPC
+extends "res://scripts/world/Interactable.gd"
 ## Townsperson with dialogue + relationship.
+## (No class_name — preloaded by TownWorld to avoid cold-start parse failures.)
 
 @export var npc_id: String = ""
 @export var display_name: String = "Townsperson"

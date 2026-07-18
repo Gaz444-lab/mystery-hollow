@@ -2,12 +2,15 @@ extends Node3D
 ## Builds Mystery Hollow from primitives — modular, era-tinted open world.
 
 const TOWN_SIZE := 80.0
+# Preload scripts (do NOT rely on global class_name — that fails on cold start / some Macs)
+const PlayerScene = preload("res://scenes/player/Player.tscn")
+const InteractableScript = preload("res://scripts/world/Interactable.gd")
+const NpcScript = preload("res://scripts/world/NPC.gd")
 
 @onready var world_root: Node3D = $WorldRoot
 @onready var sun: DirectionalLight3D = $Sun
 @onready var env: WorldEnvironment = $WorldEnvironment
 
-var _player_scene := preload("res://scenes/player/Player.tscn")
 var _player: CharacterBody3D
 
 
@@ -72,7 +75,7 @@ func enter_location(loc: String) -> void:
 func _spawn_player() -> void:
 	if _player != null and is_instance_valid(_player):
 		_player.queue_free()
-	_player = _player_scene.instantiate()
+	_player = PlayerScene.instantiate() as CharacterBody3D
 	add_child(_player)
 	var spawn := Vector3(0, 1.5, 10)
 	if GameState.current_location == "house":
@@ -227,7 +230,7 @@ func _build_office_interior() -> void:
 
 
 func _spawn_npc(npc_id: String, display_name: String, pos: Vector3, color: Color) -> void:
-	var npc := TownNPC.new()
+	var npc = NpcScript.new()
 	npc.npc_id = npc_id
 	npc.display_name = display_name
 	npc.body_color = color
@@ -309,7 +312,7 @@ func _add_door(pos: Vector3, type: String, label: String) -> void:
 func _add_evidence(pos: Vector3, evidence_id: String, label: String) -> void:
 	if CaseManager.has_evidence(evidence_id):
 		return
-	var e := _make_interactable(pos, evidence_id, label, "evidence")
+	var e = _make_interactable(pos, evidence_id, label, "evidence")
 	var mi := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = 0.25
@@ -325,8 +328,8 @@ func _add_evidence(pos: Vector3, evidence_id: String, label: String) -> void:
 	world_root.add_child(e)
 
 
-func _make_interactable(pos: Vector3, id: String, label: String, type: String) -> Interactable:
-	var node := Interactable.new()
+func _make_interactable(pos: Vector3, id: String, label: String, type: String) -> StaticBody3D:
+	var node = InteractableScript.new()
 	node.position = pos
 	node.interact_id = id
 	node.label = label
