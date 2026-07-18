@@ -1,12 +1,9 @@
 extends "res://scripts/world/Interactable.gd"
-## Townsperson with dialogue + relationship.
-## (No class_name — preloaded by TownWorld to avoid cold-start parse failures.)
+## Blocky Minecraft-style townsfolk.
 
 @export var npc_id: String = ""
 @export var display_name: String = "Townsperson"
 @export var body_color: Color = Color(0.4, 0.35, 0.3)
-
-var _mesh: MeshInstance3D
 
 
 func _ready() -> void:
@@ -17,34 +14,26 @@ func _ready() -> void:
 
 
 func _build_mesh() -> void:
-	_mesh = MeshInstance3D.new()
-	var cap := CapsuleMesh.new()
-	cap.radius = 0.32
-	cap.height = 1.5
-	_mesh.mesh = cap
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = body_color
-	_mesh.material_override = mat
-	_mesh.position.y = 0.9
-	add_child(_mesh)
-	var head := MeshInstance3D.new()
-	var s := SphereMesh.new()
-	s.radius = 0.25
-	head.mesh = s
-	head.position.y = 1.85
-	var hmat := StandardMaterial3D.new()
-	hmat.albedo_color = Color(0.85, 0.7, 0.55)
-	head.material_override = hmat
-	add_child(head)
-	# Collision
+	var VoxelStyle = load("res://scripts/world/VoxelStyle.gd")
+	var skin := Color(0.9, 0.72, 0.55)
+	var pants := Color(0.25, 0.25, 0.35)
+	var hair := Color(0.2, 0.12, 0.08)
+	# Slight variety from shirt color hash
+	var h: float = fmod(body_color.r * 7.0 + body_color.g * 3.0, 1.0)
+	if h > 0.6:
+		hair = Color(0.55, 0.35, 0.15)
+	elif h > 0.3:
+		hair = Color(0.12, 0.1, 0.1)
+	VoxelStyle.build_humanoid(self, skin, body_color, pants, hair)
+	# Collision capsule for talking range
 	var col := CollisionShape3D.new()
 	var shape := CapsuleShape3D.new()
 	shape.radius = 0.4
-	shape.height = 1.8
+	shape.height = 1.9
 	col.shape = shape
-	col.position.y = 0.9
+	col.position.y = 0.95
 	add_child(col)
 
 
-func interact(actor: Node) -> void:
+func interact(_actor: Node) -> void:
 	get_tree().call_group("hud", "open_dialogue", npc_id, display_name)

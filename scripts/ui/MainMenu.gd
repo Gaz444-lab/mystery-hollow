@@ -20,12 +20,12 @@ func _ready() -> void:
 	title.text = "MYSTERY HOLLOW"
 	# Version stamp so we can tell if Connor actually got the update
 	var ver := _read_version()
-	subtitle.text = "Open-world detective life simulator  ·  %s" % ver
+	subtitle.text = "Blocky detective adventure (Minecraft vibes)  ·  %s" % ver
 	era_panel.visible = false
 	load_panel.visible = false
 	_populate_eras()
 	_populate_loads()
-	how_to.text = "[b]Controls[/b]\nWASD — Move · Mouse — Look · Shift — Sprint · E — Interact\nJ — Journal · I — Inventory · B — Build mode (home) · Esc — Free cursor\n\n[b]Goal[/b]\nLive in Mystery Hollow, manage needs, and solve the Riverside Murder.\n\n[b]Build[/b] %s\nIf this says 'unknown', run Update Mystery Hollow." % ver
+	how_to.text = "[b]Style[/b]\nVoxel world · blocky characters · dig into mysteries!\n\n[b]Controls[/b]\nWASD — Move · Mouse — Look · Shift — Sprint · E — Interact\nJ — Journal · I — Inventory · Esc — Free cursor / pause\n\n[b]Goal[/b]\nExplore Mystery Hollow, talk to blocky townsfolk, collect golden clue blocks, solve the Riverside Murder.\n\n[b]Build[/b] %s\nIf this says 'unknown', run Update Mystery Hollow." % ver
 
 
 func _read_version() -> String:

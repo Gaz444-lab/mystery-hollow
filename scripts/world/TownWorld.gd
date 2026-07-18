@@ -1,11 +1,11 @@
 extends Node3D
-## Builds Mystery Hollow from primitives — modular, era-tinted open world.
+## Mystery Hollow as a Minecraft-style blocky open world.
 
-const TOWN_SIZE := 80.0
-# Preload scripts (do NOT rely on global class_name — that fails on cold start / some Macs)
+const TOWN_SIZE := 64.0
 const PlayerScene = preload("res://scenes/player/Player.tscn")
 const InteractableScript = preload("res://scripts/world/Interactable.gd")
 const NpcScript = preload("res://scripts/world/NPC.gd")
+const VoxelStyle = preload("res://scripts/world/VoxelStyle.gd")
 
 @onready var world_root: Node3D = $WorldRoot
 @onready var sun: DirectionalLight3D = $Sun
@@ -16,12 +16,9 @@ var _player: CharacterBody3D
 
 func _ready() -> void:
 	add_to_group("game_root")
-	# Environment FIRST so the 3D view is never pure black
 	_setup_environment()
 	EventBus.time_changed.connect(_on_time)
 	EventBus.era_changed.connect(func(_e): pass)
-
-	# Defer heavy build one frame so the tree + physics are ready
 	call_deferred("_boot_world")
 
 
@@ -34,7 +31,7 @@ func _boot_world() -> void:
 	_on_time(TimeSystem.get_hour(), TimeSystem.day)
 	if not GameState.tutorial_done:
 		EventBus.notification.emit(
-			"Welcome to Mystery Hollow. Blue building = Detective Agency. WASD move · mouse look · E interact · J journal · Esc free cursor.",
+			"Welcome to blocky Mystery Hollow! Blue wool building = Detective Agency. WASD · mouse · E interact · J journal.",
 			8.0
 		)
 		GameState.tutorial_done = true
@@ -47,15 +44,19 @@ func _setup_environment() -> void:
 		env.environment = Environment.new()
 	var e: Environment = env.environment
 	e.background_mode = Environment.BG_COLOR
-	e.background_color = Color(0.45, 0.62, 0.82)
+	e.background_color = VoxelStyle.SKY
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color(0.55, 0.58, 0.62)
-	e.ambient_light_energy = 0.85
-	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	e.ambient_light_color = Color(0.75, 0.78, 0.82)
+	e.ambient_light_energy = 0.95
+	e.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+	e.fog_enabled = true
+	e.fog_light_color = VoxelStyle.SKY
+	e.fog_density = 0.0015
 	if sun:
-		sun.light_energy = 1.1
+		sun.light_energy = 1.15
 		sun.shadow_enabled = true
-		sun.rotation_degrees = Vector3(-50, 35, 0)
+		sun.light_color = Color(1.0, 0.98, 0.9)
+		sun.rotation_degrees = Vector3(-55, 40, 0)
 
 
 func enter_location(loc: String) -> void:
@@ -64,12 +65,12 @@ func enter_location(loc: String) -> void:
 	GameState.current_location = loc
 	match loc:
 		"house":
-			_player.global_position = Vector3(-28, 1.2, 4)
+			_player.global_position = Vector3(-24, 1.2, 6)
 		"office":
-			_player.global_position = Vector3(12, 1.2, -2)
+			_player.global_position = Vector3(10, 1.2, 0)
 		"town":
 			_player.global_position = Vector3(0, 1.2, 8)
-	EventBus.notification.emit("Location: %s" % loc.capitalize(), 1.5)
+	EventBus.notification.emit("Chunk: %s" % loc.capitalize(), 1.5)
 
 
 func _spawn_player() -> void:
@@ -79,22 +80,18 @@ func _spawn_player() -> void:
 	add_child(_player)
 	var spawn := Vector3(0, 1.5, 10)
 	if GameState.current_location == "house":
-		spawn = Vector3(-28, 1.5, 4)
+		spawn = Vector3(-24, 1.5, 6)
 	elif GameState.current_location == "office":
-		spawn = Vector3(12, 1.5, -2)
+		spawn = Vector3(10, 1.5, 0)
 	else:
 		var p: Vector3 = GameState.player_position
-		if p.y < 0.5 or p.y > 50.0:
-			p.y = 1.5
-		# Prefer a known-good town spawn for first load
-		if p.is_equal_approx(Vector3(0, 1, 8)) or p.length() < 0.1:
+		if p.y < 0.5 or p.y > 50.0 or p.is_equal_approx(Vector3(0, 1, 8)) or p.length() < 0.1:
 			spawn = Vector3(0, 1.5, 10)
 		else:
 			spawn = Vector3(p.x, maxf(p.y, 1.5), p.z)
 	_player.global_position = spawn
 	_player.rotation.y = GameState.player_rotation_y
-	# Ensure a current camera exists
-	var cam := _player.get_node_or_null("CameraPivot/SpringArm3D/Camera3D") as Camera3D
+	var cam := _player.get_node_or_null("CameraPivot/Camera3D") as Camera3D
 	if cam:
 		cam.current = true
 
@@ -102,165 +99,171 @@ func _spawn_player() -> void:
 func _build_town() -> void:
 	for c in world_root.get_children():
 		c.queue_free()
-	# Wait a frame so queue_free settles when rebuilding
-	var pal: Dictionary = EraManager.get_palette()
 
-	# Ground — mesh + collision as separate robust bodies
-	_add_ground(pal.get("grass", Color(0.25, 0.42, 0.22)))
-
-	# Main road (cross)
-	_box(Vector3(0, 0.05, 0), Vector3(8, 0.08, TOWN_SIZE * 0.7), pal.get("road", Color(0.2, 0.2, 0.22)), false)
-	_box(Vector3(0, 0.05, 0), Vector3(TOWN_SIZE * 0.6, 0.08, 8), pal.get("road", Color(0.2, 0.2, 0.22)), false)
-
-	# Downtown
-	_building(Vector3(10, 0, -12), Vector3(8, 5, 6), pal.get("building_a", Color(0.5, 0.45, 0.4)), "General Store")
-	_building(Vector3(20, 0, -12), Vector3(7, 4, 6), pal.get("building_b", Color(0.4, 0.42, 0.48)), "Diner")
-	_building(Vector3(-10, 0, -12), Vector3(9, 6, 7), pal.get("building_a", Color(0.5, 0.45, 0.4)), "Town Hall")
-	_building(Vector3(-20, 0, -10), Vector3(6, 4, 6), pal.get("building_b", Color(0.4, 0.42, 0.48)), "Clinic")
-
-	# Detective Agency
-	_building(Vector3(12, 0, 10), Vector3(8, 4.5, 7), pal.get("accent", Color(0.25, 0.45, 0.55)), "Detective Agency")
-	_add_door(Vector3(12, 0.1, 14.2), "door_office", "Enter Detective Agency")
-
-	# Player house
-	_building(Vector3(-28, 0, 8), Vector3(9, 4, 8), Color(0.55, 0.48, 0.40), "Your Home")
-	_add_door(Vector3(-28, 0.1, 12.5), "door_house", "Enter Home")
-
+	_add_layered_ground()
+	_add_path_cross()
+	_voxel_building(Vector3(8, 0, -10), Vector3i(7, 5, 6), VoxelStyle.PLANKS, VoxelStyle.OAK, "General Store")
+	_voxel_building(Vector3(18, 0, -10), Vector3i(6, 4, 6), VoxelStyle.BRICK, VoxelStyle.STONE, "Diner")
+	_voxel_building(Vector3(-10, 0, -10), Vector3i(8, 6, 7), VoxelStyle.STONE, VoxelStyle.COBBLE, "Town Hall")
+	_voxel_building(Vector3(-20, 0, -8), Vector3i(5, 4, 5), VoxelStyle.WOOL_GREEN, VoxelStyle.STONE, "Clinic")
+	# Detective Agency — blue wool (easy to spot)
+	_voxel_building(Vector3(10, 0, 8), Vector3i(7, 5, 6), VoxelStyle.WOOL_BLUE, VoxelStyle.IRON, "Detective Agency")
+	_add_door(Vector3(10, 0.1, 11.5), "door_office", "Enter Detective Agency")
+	# Your house
+	_voxel_building(Vector3(-24, 0, 8), Vector3i(8, 4, 7), VoxelStyle.PLANKS, VoxelStyle.OAK, "Your Home")
+	_add_door(Vector3(-24, 0.1, 12.0), "door_house", "Enter Home")
 	# Warehouse
-	_building(Vector3(28, 0, 18), Vector3(12, 5, 10), Color(0.35, 0.35, 0.38), "Warehouse")
-	_add_evidence(Vector3(28, 0.5, 14), "ledger_page", "Search desk — torn ledger")
+	_voxel_building(Vector3(24, 0, 16), Vector3i(10, 5, 8), VoxelStyle.STONE, VoxelStyle.COBBLE, "Warehouse")
+	_add_evidence(Vector3(24, 0.6, 12), "ledger_page", "Search chest — torn ledger")
 
-	# River + crime scene
-	_box(Vector3(36, -0.05, 0), Vector3(6, 0.35, 40), Color(0.15, 0.35, 0.50), false)
-	_add_label(Vector3(36, 1.5, -8), "Riverbank")
-	_add_evidence(Vector3(34, 0.4, -6), "river_watch", "Broken watch in the mud")
-	_add_evidence(Vector3(35, 0.4, -4), "muddy_boots_cast", "Boot print in soft earth")
-	_add_evidence(Vector3(33.5, 0.4, -7.5), "threatening_note", "Torn note in the reeds")
-	_add_label(Vector3(34, 2.2, -5), "CRIME SCENE")
+	# River (water cubes) + crime scene
+	for z in range(-12, 12, 2):
+		_block(Vector3(32, -0.2, float(z)), Vector3(4, 0.6, 2), VoxelStyle.WATER, true)
+		_block(Vector3(34, 0.0, float(z)), Vector3(2, 0.4, 2), VoxelStyle.SAND, false)
+	_add_label(Vector3(32, 2.0, -6), "River")
+	_add_evidence(Vector3(30, 0.5, -4), "river_watch", "Broken watch in the mud")
+	_add_evidence(Vector3(31, 0.5, -2), "muddy_boots_cast", "Boot print")
+	_add_evidence(Vector3(29.5, 0.5, -5), "threatening_note", "Torn note")
+	_add_label(Vector3(30, 2.5, -3), "CRIME SCENE")
+	# Gold block marker
+	_block(Vector3(30, 0.5, -3.5), Vector3(0.6, 0.6, 0.6), VoxelStyle.GOLD, false)
 
-	# Forest edge
-	for i in range(12):
-		var fx := -35.0 + float(i) * 3.0
-		_tree(Vector3(fx, 0, 32))
-		_tree(Vector3(fx + 1.5, 0, 35))
+	# Forest (Minecraft oak-style)
+	for i in range(14):
+		var fx := -28.0 + float(i) * 3.5
+		_mc_tree(Vector3(fx, 0, 28))
+		_mc_tree(Vector3(fx + 1.5, 0, 32))
 
 	# Park
-	_box(Vector3(-5, 0.06, 15), Vector3(10, 0.1, 10), Color(0.18, 0.40, 0.18), false)
-	_tree(Vector3(-5, 0, 15))
+	_block(Vector3(-4, 0.05, 14), Vector3(10, 0.15, 10), VoxelStyle.GRASS_TOP, false)
+	_mc_tree(Vector3(-4, 0, 14))
 
 	_build_house_interior()
 	_build_office_interior()
 
-	# NPCs (never use param name "name" — conflicts with Node.name)
-	_spawn_npc("deputy_cole", "Deputy Cole", Vector3(11, 0, 8), Color(0.2, 0.25, 0.45))
-	_spawn_npc("mayor_hart", "Mayor Hart", Vector3(-10, 0, -8), Color(0.45, 0.35, 0.25))
-	_spawn_npc("bartender_sam", "Sam", Vector3(20, 0, -8), Color(0.5, 0.3, 0.25))
-	_spawn_npc("witness_ben", "Ben Carter", Vector3(18, 0, -9), Color(0.35, 0.45, 0.35))
-	_spawn_npc("suspect_vera", "Vera Lang", Vector3(-12, 0, -9), Color(0.55, 0.35, 0.40))
-	_spawn_npc("suspect_marcus", "Marcus Reed", Vector3(26, 0, 16), Color(0.3, 0.3, 0.32))
-	_spawn_npc("suspect_owen", "Owen Pike", Vector3(2, 0, 6), Color(0.55, 0.50, 0.30))
-	_spawn_npc("shopkeeper_rita", "Rita", Vector3(10, 0, -9), Color(0.6, 0.4, 0.35))
-	_spawn_npc("dr_ellis", "Dr. Ellis", Vector3(-20, 0, -7), Color(0.7, 0.7, 0.75))
+	# Blocky townsfolk
+	_spawn_npc("deputy_cole", "Deputy Cole", Vector3(9, 0, 6), VoxelStyle.WOOL_BLUE)
+	_spawn_npc("mayor_hart", "Mayor Hart", Vector3(-10, 0, -6), Color(0.55, 0.25, 0.2))
+	_spawn_npc("bartender_sam", "Sam", Vector3(18, 0, -6), Color(0.6, 0.35, 0.2))
+	_spawn_npc("witness_ben", "Ben Carter", Vector3(16, 0, -7), Color(0.3, 0.5, 0.35))
+	_spawn_npc("suspect_vera", "Vera Lang", Vector3(-12, 0, -7), Color(0.7, 0.3, 0.45))
+	_spawn_npc("suspect_marcus", "Marcus Reed", Vector3(22, 0, 14), Color(0.35, 0.35, 0.4))
+	_spawn_npc("suspect_owen", "Owen Pike", Vector3(2, 0, 6), Color(0.75, 0.65, 0.25))
+	_spawn_npc("shopkeeper_rita", "Rita", Vector3(8, 0, -7), Color(0.65, 0.4, 0.35))
+	_spawn_npc("dr_ellis", "Dr. Ellis", Vector3(-20, 0, -5), Color(0.85, 0.85, 0.9))
 
-	# Street lamps
-	for z in [-20, -5, 10, 25]:
-		_lamp(Vector3(3.5, 0, float(z)))
-		_lamp(Vector3(-3.5, 0, float(z)))
+	# Torch-style lamps (glowing blocks)
+	for z in [-16, -4, 8, 20]:
+		_torch_post(Vector3(3.0, 0, float(z)))
+		_torch_post(Vector3(-3.0, 0, float(z)))
 
-	# Fill light near spawn so the world is never underexposed
+	# Floating clouds
+	for i in range(6):
+		var cx := -20.0 + float(i) * 10.0
+		_block(Vector3(cx, 18, -5.0 + float(i % 3) * 8.0), Vector3(6, 1.2, 3), VoxelStyle.CLOUD, false)
+
+	# Fill light
 	var fill := OmniLight3D.new()
-	fill.position = Vector3(0, 8, 10)
-	fill.light_energy = 0.6
-	fill.omni_range = 40.0
-	fill.light_color = Color(1.0, 0.97, 0.92)
+	fill.position = Vector3(0, 10, 10)
+	fill.light_energy = 0.45
+	fill.omni_range = 50.0
+	fill.light_color = Color(1.0, 0.98, 0.92)
 	world_root.add_child(fill)
 
 
-func _add_ground(color: Color) -> void:
-	var thickness := 2.0
-	var mi := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = Vector3(TOWN_SIZE, thickness, TOWN_SIZE)
-	mi.mesh = box
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mi.material_override = mat
-	# Top of ground at y = 0
-	mi.position = Vector3(0, -thickness * 0.5, 0)
-	world_root.add_child(mi)
+func _add_layered_ground() -> void:
+	# Dirt base + grass top slab (Minecraft dirt/grass)
+	_block(Vector3(0, -1.0, 0), Vector3(TOWN_SIZE, 1.6, TOWN_SIZE), VoxelStyle.DIRT, true)
+	_block(Vector3(0, 0.05, 0), Vector3(TOWN_SIZE, 0.2, TOWN_SIZE), VoxelStyle.GRASS_TOP, false)
+	# Border stone
+	_block(Vector3(0, 0.15, TOWN_SIZE * 0.5 - 0.5), Vector3(TOWN_SIZE, 0.5, 1.0), VoxelStyle.COBBLE, false)
+	_block(Vector3(0, 0.15, -TOWN_SIZE * 0.5 + 0.5), Vector3(TOWN_SIZE, 0.5, 1.0), VoxelStyle.COBBLE, false)
 
-	var body := StaticBody3D.new()
-	body.collision_layer = 1
-	body.collision_mask = 0
-	body.position = Vector3(0, -thickness * 0.5, 0)
-	var col := CollisionShape3D.new()
-	var shape := BoxShape3D.new()
-	shape.size = Vector3(TOWN_SIZE, thickness, TOWN_SIZE)
-	col.shape = shape
-	body.add_child(col)
-	world_root.add_child(body)
+
+func _add_path_cross() -> void:
+	_block(Vector3(0, 0.12, 0), Vector3(6, 0.12, TOWN_SIZE * 0.65), VoxelStyle.COBBLE, false)
+	_block(Vector3(0, 0.12, 0), Vector3(TOWN_SIZE * 0.55, 0.12, 6), VoxelStyle.COBBLE, false)
+
+
+func _voxel_building(pos: Vector3, size: Vector3i, wall: Color, trim: Color, title: String) -> void:
+	var w := float(size.x)
+	var h := float(size.y)
+	var d := float(size.z)
+	# Walls as solid block (hollow would need many boxes — solid is fine for vibe)
+	_block(pos + Vector3(0, h * 0.5, 0), Vector3(w, h, d), wall, true)
+	# Roof slab
+	_block(pos + Vector3(0, h + 0.25, 0), Vector3(w + 0.8, 0.5, d + 0.8), trim, false)
+	# Door hole marker (darker recess)
+	_block(pos + Vector3(0, 1.0, d * 0.5 + 0.05), Vector3(1.2, 2.0, 0.15), Color(0.12, 0.1, 0.08), false)
+	# Window glass blocks
+	_block(pos + Vector3(-w * 0.25, h * 0.55, d * 0.5 + 0.05), Vector3(1.0, 1.0, 0.12), VoxelStyle.GLASS, true)
+	_block(pos + Vector3(w * 0.25, h * 0.55, d * 0.5 + 0.05), Vector3(1.0, 1.0, 0.12), VoxelStyle.GLASS, true)
+	_add_label(pos + Vector3(0, h + 1.2, d * 0.5), title)
+
+
+func _mc_tree(pos: Vector3) -> void:
+	# Trunk
+	_block(pos + Vector3(0, 1.5, 0), Vector3(0.7, 3.0, 0.7), VoxelStyle.OAK, false)
+	# Leaf cubes (cross)
+	_block(pos + Vector3(0, 3.6, 0), Vector3(3.2, 2.2, 3.2), VoxelStyle.LEAVES, false)
+	_block(pos + Vector3(0, 4.8, 0), Vector3(2.0, 1.4, 2.0), VoxelStyle.LEAVES, false)
+
+
+func _torch_post(pos: Vector3) -> void:
+	_block(pos + Vector3(0, 1.0, 0), Vector3(0.25, 2.0, 0.25), VoxelStyle.OAK, false)
+	_block(pos + Vector3(0, 2.2, 0), Vector3(0.45, 0.45, 0.45), Color(1.0, 0.85, 0.3), false)
+	var light := OmniLight3D.new()
+	light.position = pos + Vector3(0, 2.4, 0)
+	light.light_energy = 0.0
+	light.omni_range = 12.0
+	light.light_color = Color(1.0, 0.85, 0.5)
+	light.set_meta("street_lamp", true)
+	world_root.add_child(light)
 
 
 func _build_house_interior() -> void:
-	var bed := _make_interactable(Vector3(-30, 0.5, 6), "bed", "Sleep (restore energy)", "bed")
-	world_root.add_child(bed)
-	var food := _make_interactable(Vector3(-26, 0.5, 6), "food", "Eat a meal", "food")
-	world_root.add_child(food)
-	var desk := _make_interactable(Vector3(-28, 0.5, 10), "case_board", "Home case board", "case_board")
-	world_root.add_child(desk)
-	for f in GameState.house_furniture:
-		var pos := _as_vec3(f.get("pos", Vector3.ZERO))
-		var world_pos := Vector3(-28, 0.4, 8) + pos
-		var col := Color(0.6, 0.5, 0.4)
-		match str(f.get("id", "")):
-			"bed":
-				col = Color(0.4, 0.35, 0.55)
-			"desk":
-				col = Color(0.35, 0.28, 0.2)
-			"lamp":
-				col = Color(0.9, 0.85, 0.5)
-		_box(world_pos, Vector3(1.2, 0.8, 1.2), col, false)
+	world_root.add_child(_make_interactable(Vector3(-26, 0.5, 6), "bed", "Sleep (respawn energy)", "bed"))
+	world_root.add_child(_make_interactable(Vector3(-22, 0.5, 6), "food", "Eat steak", "food"))
+	world_root.add_child(_make_interactable(Vector3(-24, 0.5, 10), "case_board", "Case map / Journal", "case_board"))
+	# Bed & crafting-table-ish blocks
+	_block(Vector3(-26, 0.4, 6), Vector3(1.4, 0.5, 2.0), VoxelStyle.WOOL_RED, false)
+	_block(Vector3(-22, 0.4, 6), Vector3(1.0, 0.9, 1.0), VoxelStyle.PLANKS, false)
 
 
 func _build_office_interior() -> void:
-	world_root.add_child(_make_interactable(Vector3(12, 0.5, 11), "case_accept", "Accept case: Riverside Murder", "case_accept"))
-	world_root.add_child(_make_interactable(Vector3(14, 0.5, 11), "case_board", "Evidence board / Journal", "case_board"))
-	world_root.add_child(_make_interactable(Vector3(10, 0.5, 11), "accuse", "Make an accusation", "accuse"))
-	world_root.add_child(_make_interactable(Vector3(13, 0.5, 8), "food", "Agency coffee", "food"))
+	world_root.add_child(_make_interactable(Vector3(10, 0.5, 9), "case_accept", "Accept case: Riverside Murder", "case_accept"))
+	world_root.add_child(_make_interactable(Vector3(12, 0.5, 9), "case_board", "Evidence board", "case_board"))
+	world_root.add_child(_make_interactable(Vector3(8, 0.5, 9), "accuse", "Make an accusation", "accuse"))
+	world_root.add_child(_make_interactable(Vector3(11, 0.5, 6), "food", "Coffee", "food"))
+	_block(Vector3(10, 0.5, 9), Vector3(1.0, 1.0, 1.0), VoxelStyle.GOLD, false)
 
 
-func _spawn_npc(npc_id: String, display_name: String, pos: Vector3, color: Color) -> void:
+func _spawn_npc(npc_id: String, display_name: String, pos: Vector3, shirt: Color) -> void:
 	var npc = NpcScript.new()
 	npc.npc_id = npc_id
 	npc.display_name = display_name
-	npc.body_color = color
+	npc.body_color = shirt
 	npc.position = pos
 	world_root.add_child(npc)
 
 
-func _as_vec3(v: Variant) -> Vector3:
-	if v is Vector3:
-		return v
-	if v is Dictionary:
-		return Vector3(float(v.get("x", 0)), float(v.get("y", 0)), float(v.get("z", 0)))
-	return Vector3.ZERO
-
-
-func _box(pos: Vector3, size: Vector3, color: Color, with_collision: bool) -> MeshInstance3D:
+func _block(pos: Vector3, size: Vector3, color: Color, with_collision: bool) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	var box := BoxMesh.new()
 	box.size = size
 	mi.mesh = box
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
+	var mat := VoxelStyle.block_material(color)
+	if color.a < 0.99:
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color.a = color.a
 	mi.material_override = mat
-	mi.position = pos + Vector3(0, size.y * 0.5, 0)
+	mi.position = pos
 	world_root.add_child(mi)
 	if with_collision:
 		var body := StaticBody3D.new()
 		body.collision_layer = 1
 		body.collision_mask = 0
-		body.position = pos + Vector3(0, size.y * 0.5, 0)
+		body.position = pos
 		var col := CollisionShape3D.new()
 		var shape := BoxShape3D.new()
 		shape.size = size
@@ -270,28 +273,6 @@ func _box(pos: Vector3, size: Vector3, color: Color, with_collision: bool) -> Me
 	return mi
 
 
-func _building(pos: Vector3, size: Vector3, color: Color, title: String) -> void:
-	_box(pos, size, color, true)
-	_add_label(pos + Vector3(0, size.y + 0.8, size.z * 0.5 + 0.2), title)
-
-
-func _tree(pos: Vector3) -> void:
-	_box(pos, Vector3(0.4, 2.5, 0.4), Color(0.35, 0.22, 0.12), false)
-	var leaves := _box(pos + Vector3(0, 2.0, 0), Vector3(2.2, 2.2, 2.2), Color(0.15, 0.40, 0.18), false)
-	leaves.position = pos + Vector3(0, 3.2, 0)
-
-
-func _lamp(pos: Vector3) -> void:
-	_box(pos, Vector3(0.15, 3.0, 0.15), Color(0.2, 0.2, 0.22), false)
-	var light := OmniLight3D.new()
-	light.position = pos + Vector3(0, 3.1, 0)
-	light.light_energy = 0.0
-	light.omni_range = 12.0
-	light.light_color = Color(1.0, 0.9, 0.7)
-	light.set_meta("street_lamp", true)
-	world_root.add_child(light)
-
-
 func _add_label(pos: Vector3, text: String) -> void:
 	var label := Label3D.new()
 	label.text = text
@@ -299,9 +280,9 @@ func _add_label(pos: Vector3, text: String) -> void:
 	label.pixel_size = 0.02
 	label.position = pos
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.modulate = Color(0.95, 0.9, 0.75)
+	label.modulate = Color(1, 1, 1)
 	label.outline_modulate = Color(0, 0, 0, 1)
-	label.outline_size = 8
+	label.outline_size = 12
 	world_root.add_child(label)
 
 
@@ -314,14 +295,13 @@ func _add_evidence(pos: Vector3, evidence_id: String, label: String) -> void:
 		return
 	var e = _make_interactable(pos, evidence_id, label, "evidence")
 	var mi := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = 0.25
-	mi.mesh = sphere
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.95, 0.8, 0.15)
+	var box := BoxMesh.new()
+	box.size = Vector3(0.45, 0.45, 0.45)
+	mi.mesh = box
+	var mat := VoxelStyle.block_material(VoxelStyle.GOLD)
 	mat.emission_enabled = true
-	mat.emission = Color(0.9, 0.7, 0.1)
-	mat.emission_energy_multiplier = 2.0
+	mat.emission = VoxelStyle.GOLD
+	mat.emission_energy_multiplier = 1.2
 	mi.material_override = mat
 	mi.position.y = 0.35
 	e.add_child(mi)
@@ -342,16 +322,15 @@ func _make_interactable(pos: Vector3, id: String, label: String, type: String) -
 	if type != "evidence":
 		var mi := MeshInstance3D.new()
 		var box := BoxMesh.new()
-		box.size = Vector3(0.7, 1.4, 0.7)
+		box.size = Vector3(0.7, 1.2, 0.7)
 		mi.mesh = box
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.25, 0.55, 0.85, 0.75)
+		var mat := VoxelStyle.block_material(Color(0.3, 0.7, 1.0, 0.8))
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.emission_enabled = true
-		mat.emission = Color(0.2, 0.4, 0.7)
-		mat.emission_energy_multiplier = 0.4
+		mat.emission = Color(0.2, 0.5, 0.9)
+		mat.emission_energy_multiplier = 0.5
 		mi.material_override = mat
-		mi.position.y = 0.7
+		mi.position.y = 0.6
 		node.add_child(mi)
 	return node
 
@@ -360,20 +339,19 @@ func _on_time(_hour: float, _day: int) -> void:
 	if sun == null or env == null:
 		return
 	var factor := TimeSystem.get_sun_factor()
-	sun.light_energy = lerpf(0.25, 1.25, factor)
-	sun.rotation_degrees = Vector3(-35.0 - factor * 40.0, 35.0, 0.0)
-	var pal: Dictionary = EraManager.get_palette()
-	var sky_day: Color = pal.get("sky_day", Color(0.5, 0.7, 0.9))
-	var sky_night: Color = pal.get("sky_night", Color(0.05, 0.06, 0.12))
-	var sky_col: Color = sky_day.lerp(sky_night, 1.0 - factor)
+	sun.light_energy = lerpf(0.25, 1.2, factor)
+	sun.rotation_degrees = Vector3(-35.0 - factor * 40.0, 40.0, 0.0)
+	var day_sky := VoxelStyle.SKY
+	var night_sky := Color(0.05, 0.06, 0.12)
+	var sky: Color = day_sky.lerp(night_sky, 1.0 - factor)
 	if env.environment == null:
 		env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = sky_col
+	env.environment.background_color = sky
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = sky_col.lightened(0.15)
-	# Keep ambient high enough that outdoor scenes never look black
-	env.environment.ambient_light_energy = lerpf(0.45, 0.9, factor)
+	env.environment.ambient_light_color = sky.lightened(0.1)
+	env.environment.ambient_light_energy = lerpf(0.5, 1.0, factor)
+	env.environment.fog_light_color = sky
 	for n in world_root.get_children():
 		if n is OmniLight3D and n.has_meta("street_lamp"):
-			(n as OmniLight3D).light_energy = 0.0 if factor > 0.35 else 2.5
+			(n as OmniLight3D).light_energy = 0.0 if factor > 0.35 else 2.8

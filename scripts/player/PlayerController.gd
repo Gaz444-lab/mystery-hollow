@@ -41,32 +41,26 @@ func _snap_to_ground() -> void:
 
 
 func _apply_character_look() -> void:
-	if mesh == null:
-		return
-	if mesh.mesh == null:
-		var capsule := CapsuleMesh.new()
-		capsule.radius = 0.35
-		capsule.height = 1.5
-		mesh.mesh = capsule
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = _char_color()
-	mesh.material_override = mat
-	if not has_node("Head"):
-		var head := MeshInstance3D.new()
-		head.name = "Head"
-		var sphere := SphereMesh.new()
-		sphere.radius = 0.28
-		head.mesh = sphere
-		head.position = Vector3(0, 0.95, 0)
-		var hmat := StandardMaterial3D.new()
-		var tones := [
-			Color(0.95, 0.85, 0.75), Color(0.90, 0.75, 0.60), Color(0.80, 0.62, 0.48),
-			Color(0.65, 0.45, 0.32), Color(0.45, 0.30, 0.22), Color(0.30, 0.20, 0.15),
-		]
-		var idx: int = clampi(int(GameState.character.get("skin_tone", 2)), 0, tones.size() - 1)
-		hmat.albedo_color = tones[idx]
-		head.material_override = hmat
-		add_child(head)
+	# Hide default capsule body — we build a Minecraft-style humanoid
+	if mesh:
+		mesh.visible = false
+	if has_node("Head"):
+		get_node("Head").queue_free()
+	var VoxelStyle = load("res://scripts/world/VoxelStyle.gd")
+	var tones := [
+		Color(0.96, 0.82, 0.68), Color(0.90, 0.75, 0.58), Color(0.80, 0.62, 0.45),
+		Color(0.65, 0.45, 0.30), Color(0.45, 0.30, 0.20), Color(0.30, 0.20, 0.14),
+	]
+	var idx: int = clampi(int(GameState.character.get("skin_tone", 2)), 0, tones.size() - 1)
+	var skin: Color = tones[idx]
+	var shirt: Color = _char_color()
+	var pants := Color(0.2, 0.25, 0.45)
+	var hair_colors := [
+		Color(0.15, 0.1, 0.08), Color(0.35, 0.2, 0.1), Color(0.55, 0.35, 0.15),
+		Color(0.7, 0.55, 0.2), Color(0.4, 0.4, 0.42), Color(0.9, 0.85, 0.7),
+	]
+	var hair_i: int = clampi(int(GameState.character.get("hair_color", 0)), 0, hair_colors.size() - 1)
+	VoxelStyle.build_humanoid(self, skin, shirt, pants, hair_colors[hair_i])
 
 
 func _char_color() -> Color:
