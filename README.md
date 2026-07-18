@@ -46,7 +46,15 @@ If it blocks Godot: **System Settings → Privacy & Security → Open Anyway**.
 
 Double-click **Update Mystery Hollow.command**, then open **Mystery Hollow** again.
 
-> Saves stay on **his** Mac only — updates do **not** wipe progress.
+The main menu subtitle should show a version like `0.1.2-blackscreen-fix`.  
+If it still says `unknown` or the game is black, re-run full setup:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Gaz444-lab/mystery-hollow/main/scripts/setup-for-connor.sh | bash
+```
+
+> Saves stay on **his** Mac only — updates do **not** wipe progress.  
+> Update now force-syncs to GitHub `main` and clears Godot cache (not saves).
 
 ### Manual / developer open
 

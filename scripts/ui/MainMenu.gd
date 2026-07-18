@@ -18,12 +18,25 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameState.phase = GameState.GamePhase.MENU
 	title.text = "MYSTERY HOLLOW"
-	subtitle.text = "Open-world detective life simulator"
+	# Version stamp so we can tell if Connor actually got the update
+	var ver := _read_version()
+	subtitle.text = "Open-world detective life simulator  ·  %s" % ver
 	era_panel.visible = false
 	load_panel.visible = false
 	_populate_eras()
 	_populate_loads()
-	how_to.text = "[b]Controls[/b]\nWASD — Move · Mouse — Look · Shift — Sprint · E — Interact\nJ — Journal · I — Inventory · B — Build mode (home) · Esc — Free cursor\n\n[b]Goal[/b]\nLive in Mystery Hollow, manage needs, and solve the Riverside Murder."
+	how_to.text = "[b]Controls[/b]\nWASD — Move · Mouse — Look · Shift — Sprint · E — Interact\nJ — Journal · I — Inventory · B — Build mode (home) · Esc — Free cursor\n\n[b]Goal[/b]\nLive in Mystery Hollow, manage needs, and solve the Riverside Murder.\n\n[b]Build[/b] %s\nIf this says 'unknown', run Update Mystery Hollow." % ver
+
+
+func _read_version() -> String:
+	if FileAccess.file_exists("res://VERSION"):
+		var f := FileAccess.open("res://VERSION", FileAccess.READ)
+		if f:
+			var t := f.get_as_text().strip_edges()
+			f.close()
+			if t != "":
+				return t
+	return "unknown (run Update)"
 
 
 func _populate_eras() -> void:
